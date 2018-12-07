@@ -2,13 +2,14 @@ require("dotenv").config();
 const keys = require("../config/keys");
 const request = require("request"); // "Request" library
 const querystring = require("querystring");
+var music = require("../models/music.js");
 
 const client_id = keys.id;
 const client_secret = keys.secret;
 const redirect_uri = keys.uri;
 
-module.exports = function(app) {
-  var generateRandomString = function(length) {
+module.exports = function (app) {
+  var generateRandomString = function (length) {
     //****************************************/ OAuth bridge
     var text = "";
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -21,7 +22,7 @@ module.exports = function(app) {
 
   var stateKey = "spotify_auth_state";
 
-  app.get("/login", function(req, res) {
+  app.get("/login", function (req, res) {
     var state = generateRandomString(16);
     res.cookie(stateKey, state);
 
@@ -29,17 +30,28 @@ module.exports = function(app) {
     var scope = "user-read-private user-read-email user-read-currently-playing playlist-modify-public";
     res.redirect(
       "https://accounts.spotify.com/authorize?" +
-        querystring.stringify({
-          response_type: "code",
-          client_id: client_id,
-          scope: scope,
-          redirect_uri: redirect_uri,
-          state: state
-        })
+      querystring.stringify({
+        response_type: "code",
+        client_id: client_id,
+        scope: scope,
+        redirect_uri: redirect_uri,
+        state: state
+      })
     );
   });
 
-  app.get("/callback", function(req, res) {
+  app.get("/guest", function (req, res) {
+    music.findAll({}).then(function (results) {
+      var songObject = {
+        songs: results
+      };
+      // results are available to us inside the .then
+      res.render('index', songObject);
+    });
+  });
+
+
+  app.get("/callback", function (req, res) {
     // your application requests refresh and access tokens
     // after checking the state parameter
 
@@ -50,9 +62,9 @@ module.exports = function(app) {
     if (state === null || state !== storedState) {
       res.redirect(
         "/#" +
-          querystring.stringify({
-            error: "state_mismatch"
-          })
+        querystring.stringify({
+          error: "state_mismatch"
+        })
       );
     } else {
       res.clearCookie(stateKey);
@@ -69,7 +81,7 @@ module.exports = function(app) {
         json: true
       };
 
-      request.post(authOptions, function(error, response, body) {
+      request.post(authOptions, function (error, response, body) {
         if (!error && response.statusCode === 200) {
           var access_token = body.access_token,
             refresh_token = body.refresh_token;
@@ -81,31 +93,31 @@ module.exports = function(app) {
           };
 
           // use the access token to access the Spotify Web API
-          request.get(options, function(error, response, body) {
+          request.get(options, function (error, response, body) {
             console.log(body);
           });
 
           // we can also pass the token to the browser to make requests from there
           res.redirect(
             "/#" +
-              querystring.stringify({
-                access_token: access_token,
-                refresh_token: refresh_token
-              })
+            querystring.stringify({
+              access_token: access_token,
+              refresh_token: refresh_token
+            })
           );
         } else {
           res.redirect(
             "/#" +
-              querystring.stringify({
-                error: "invalid_token"
-              })
+            querystring.stringify({
+              error: "invalid_token"
+            })
           );
         }
       });
     }
   });
 
-  app.get("/refresh_token", function(req, res) {
+  app.get("/refresh_token", function (req, res) {
     // requesting access token from refresh token
     var refresh_token = req.query.refresh_token;
     var authOptions = {
@@ -118,7 +130,7 @@ module.exports = function(app) {
       json: true
     };
 
-    request.post(authOptions, function(error, response, body) {
+    request.post(authOptions, function (error, response, body) {
       if (!error && response.statusCode === 200) {
         var access_token = body.access_token;
         res.send({
@@ -130,7 +142,7 @@ module.exports = function(app) {
   //*****************************************OAuth bridge End
 
   // Render 404 page for any unmatched routes
-  app.get("*", function(req, res) {
+  app.get("*", function (req, res) {
     res.sendFile("/404.html", { root: "./public" });
   });
 };

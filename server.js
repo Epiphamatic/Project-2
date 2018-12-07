@@ -13,12 +13,18 @@ app
   .use(express.json())
   .use(cookieParser());
 
+var exphbs = require('express-handlebars');
+
+app.engine('handlebars', exphbs({ defaultLayout: 'main' }));
+app.set('view engine', 'handlebars');
+
 // Routes
 require("./routes/apiRoutes")(app);
 require("./routes/htmlRoutes")(app);
 
-app.listen(PORT, function() {
-  console.log("==> 🌎  Listening on port %s. Visit http://localhost:%s/ in your browser.", PORT, PORT);
+app.listen(PORT, function () {
+  //console.log("==> 🌎  Listening on port %s. Visit http://localhost:%s/ in your browser.", PORT, PORT);
+  console.log("==> 🌎  Listening on port 10010. Visit http://localhost:10010/ in your browser.", PORT, PORT);
 });
 
 module.exports = app;

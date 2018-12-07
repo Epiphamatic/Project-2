@@ -1,0 +1,24 @@
+<h1>Song list</h1>
+
+<div class="container">
+    <div class="row">
+        <div class="col s6">
+            <br>
+            <br>
+            <h4 class="blinking">Playlist:</h4>
+            <br>
+            <table>
+
+                {{#each songs}}
+                <tr>
+                    <td>{{this.rank}}</td>
+                    <td>{{this.song}}</td>
+                    <td>{{this.artist}}</td>
+                    <td>{{this.upcount}}</td>
+                    <td>{{this.downcount}}</td>
+                </tr>
+                {{/each}}
+            </table>
+        </div>
+    </div>
+</div>
