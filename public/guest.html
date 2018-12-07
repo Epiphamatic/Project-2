@@ -1,18 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Have Fun!</title>
-  </head>
-  <body>
-    <form>
-      <input type="text" id="music_meta" />Input Music Name <br />
-      <input type="submit" />
-    </form>
-    <script>
-      const music_input = document.querySelector("#music_meta");
-    </script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>Have Fun!</title>
+</head>
+
+<body>
+
+  <!-- ka included name=song -->
+  <form action="/music/add/" method="POST"> 
+    <input type="text" id="music_meta" name=song />Input Music Name <br />
+    <input type="submit" />
+  </form>
+ 
+  <script src="https://code.jquery.com/jquery.js"></script>
+  <script>
+    const music_input = document.querySelector("#music_meta");
+    $.get("/api/guest/songs" , function(data) {
+        //console.log(data);
+        console.log(data[0].artist);
+        for(i=0; i<data.length; i++){
+          
+        }
+        alert(data);
+        // if (data) {
+        //   $("#stats").show();
+        //   $("#name").text(data.name);
+        //   $("#role").text(data.role);
+        //   $("#age").text(data.age);
+        //   $("#force-points").text(data.forcePoints);
+        // }
+        // else {
+        //   $("#name").text("The force is not strong with this one. Your character was not found.");
+        //   $("#stats").hide();
+        // }
+      });
+  </script>
+
+  
+</body>
+
 </html>

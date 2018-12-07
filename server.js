@@ -14,6 +14,10 @@ app
   .use(express.json())
   .use(cookieParser());
 
+// Kamakshi
+// app.engine('handlebars', exphbs({ defaultLayout: 'main' }));
+// app.set('view engine', 'handlebars');
+
 // Handlebars
 // app.engine(
 //   "handlebars",
@@ -26,6 +30,11 @@ app
 // Routes
 require("./routes/apiRoutes")(app);
 require("./routes/htmlRoutes")(app);
+
+// <<<<<<< kamakshi1
+// app.listen(PORT, function () {
+//   //console.log("==> 🌎  Listening on port %s. Visit http://localhost:%s/ in your browser.", PORT, PORT);
+//   console.log("==> 🌎  Listening on port 10010. Visit http://localhost:10010/ in your browser.", PORT, PORT);
 
 var syncOptions = { force: false };
 
