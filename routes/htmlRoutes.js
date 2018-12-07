@@ -11,7 +11,8 @@ module.exports = function(app) {
   var generateRandomString = function(length) {
     //****************************************/ OAuth bridge
     var text = "";
-    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    var possible =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
     for (var i = 0; i < length; i++) {
       text += possible.charAt(Math.floor(Math.random() * possible.length));
@@ -26,7 +27,8 @@ module.exports = function(app) {
     res.cookie(stateKey, state);
 
     // your application requests authorization
-    var scope = "user-read-private user-read-email user-read-currently-playing playlist-modify-public";
+    var scope =
+      "user-read-private user-read-email user-read-currently-playing playlist-read-private playlist-modify-private";
     res.redirect(
       "https://accounts.spotify.com/authorize?" +
         querystring.stringify({
@@ -34,7 +36,8 @@ module.exports = function(app) {
           client_id: client_id,
           scope: scope,
           redirect_uri: redirect_uri,
-          state: state
+          state: state,
+          show_dialog: true
         })
     );
   });
@@ -64,7 +67,9 @@ module.exports = function(app) {
           grant_type: "authorization_code"
         },
         headers: {
-          Authorization: "Basic " + new Buffer(client_id + ":" + client_secret).toString("base64")
+          Authorization:
+            "Basic " +
+            new Buffer(client_id + ":" + client_secret).toString("base64")
         },
         json: true
       };
@@ -110,7 +115,11 @@ module.exports = function(app) {
     var refresh_token = req.query.refresh_token;
     var authOptions = {
       url: "https://accounts.spotify.com/api/token",
-      headers: { Authorization: "Basic " + new Buffer(client_id + ":" + client_secret).toString("base64") },
+      headers: {
+        Authorization:
+          "Basic " +
+          new Buffer(client_id + ":" + client_secret).toString("base64")
+      },
       form: {
         grant_type: "refresh_token",
         refresh_token: refresh_token
