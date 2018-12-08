@@ -2,7 +2,7 @@ require("dotenv").config();
 const keys = require("../config/keys");
 const request = require("request"); // "Request" library
 const querystring = require("querystring");
-
+const db = require("../models");
 const client_id = keys.id;
 const client_secret = keys.secret;
 const redirect_uri = keys.uri;
@@ -137,6 +137,13 @@ module.exports = function(app) {
     });
   });
   //*****************************************OAuth bridge End
+  // *************Kamakshi***************************
+  app.get("/guest", function(req, res) {
+    db.Playlist.findAll({}).then(function(results) {
+      // results are available to us inside the .then
+      res.json(results);
+    });
+  });
 
   // Render 404 page for any unmatched routes
   app.get("*", function(req, res) {

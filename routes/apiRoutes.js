@@ -30,8 +30,22 @@ module.exports = function(app) {
       res.json(dbExamples);
     });
   });
-
-  // Token
+  // Token Kamakshi's way with useid and token deleted
+  // *************kamakshi1******************
+  // Create a new example
+  //   app.post("/api/token", function (req, res) {
+  //     var userid = req.body.userid || {deleted}
+  //     var token = req.body.token || {deleted}
+  //     spotify
+  //       .request('https://api.spotify.com/v1/users/' + userid + '/playlists')
+  //       .then(function (data) {
+  //         res.json(data);
+  //         console.log(data);
+  //       })
+  //       .catch(function (err) {
+  //         console.error('Error occurred: ' + err);
+  //       });
+  // Token Qi's way
   app.post("/api/token", function(req, res) {
     console.log(req.body);
     at = req.body.access_token;
@@ -59,7 +73,6 @@ module.exports = function(app) {
   //reason not use spotify-web-api-node, IT IS NOT WORK!!!
   app.post("/api/tracks", function(req, res) {
     playlist_id = req.body.playlistid;
-    // console.log(playlist_id);
     fetch(`https://api.spotify.com/v1/playlists/${playlist_id}/tracks`, {
       headers: { Authorization: `Bearer ${at}` }
     })
