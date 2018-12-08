@@ -1,4 +1,5 @@
 const fetch = require("node-fetch");
+// Requiring our Playlist model
 const db = require("../models");
 //server-side access token
 let at = "";
@@ -8,7 +9,10 @@ let rt = "";
 let user_id = "";
 //server-side playlist_id
 let playlist_id = "";
-// Requiring our Playlist model
+//rankup trigger
+let upTrigger;
+//rankdown trigger
+let downTrigger;
 
 // function deleteTrack(){
 //   fetch(`https://api.spotify.com/v1/playlists/${playlist_id}/tracks`, {
