@@ -8,6 +8,10 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING,
       allowNull: false
     },
+    uri: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
     artist: {
       type: DataTypes.STRING,
       allowNull: false
