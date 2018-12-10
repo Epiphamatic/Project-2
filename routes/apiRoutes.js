@@ -1,22 +1,56 @@
+require("dotenv").config();
+const keys = require("../config/keys");
+const client_id = keys.id;
+const client_secret = keys.secret;
 const fetch = require("node-fetch");
 // Requiring our Playlist model
 const db = require("../models");
+const axios = require("axios");
 // server side access token
 let at;
 //rankup trigger
 let upTrigger;
 //rankdown trigger
 let downTrigger;
+// Magic spotify, need huge improvement on this part document!!!
+// I have to use a different package axios to fetch. Node-fetch just not work.
+function refreshSpotifyToken() {
+  axios({
+    url: "https://accounts.spotify.com/api/token",
+    method: "post",
+    params: {
+      grant_type: "client_credentials"
+    },
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    auth: {
+      username: `${client_id}`,
+      password: `${client_secret}`
+    }
+  })
+    .then(function(response) {
+      console.log(response.data.access_token);
+      db.Token.update(
+        { accessToken: response.data.access_token },
+        { where: { id: 1 } }
+      );
+    })
+    .catch(function(error) {});
+}
 
-// function deleteTrack(){
-//   fetch(`https://api.spotify.com/v1/playlists/${playlist_id}/tracks`, {
-//   method: "DELETE",
-//   body:
-//   headers: { Authorization: `Bearer ${at}`,
-//   "Content-Type": "application/json" }
-//     })
-// }
-
+function deleteFromSpotify(songId) {
+  fetch(`https://api.spotify.com/v1/playlists/${playlist_id}/tracks`, {
+    method: "DELETE",
+    body: songId,
+    headers: {
+      Authorization: `Bearer ${at}`,
+      "Content-Type": "application/json"
+    }
+  });
+}
+function deleteFromDatabase() {}
 module.exports = function(app) {
   // Get all examples
   app.get("/api/examples", function(req, res) {
@@ -54,7 +88,9 @@ module.exports = function(app) {
             hostId: req.body.spotify_user_id
           },
           { where: { id: 1 } }
-        );
+        ).then(() => {
+          setInterval(refreshSpotifyToken, 3500000);
+        });
       } else {
         db.Token.create({
           accessToken: req.body.access_token,
