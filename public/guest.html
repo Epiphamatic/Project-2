@@ -5,14 +5,108 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Have Fun!</title>
+    <style>
+      .ui-helper-hidden-accessible {
+        display: none;
+      }
+    </style>
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+      crossorigin="anonymous"
+    />
   </head>
   <body>
+    <button id="addSong">Add Song</button>
     <form>
-      <input type="text" id="music_meta" />Input Music Name <br />
+      <input type="text" id="music-input" placeholder="Enter Song Name" />Input
+      Music Name <br />
       <input type="submit" />
     </form>
+
+    <script
+      src="https://code.jquery.com/jquery-3.3.1.min.js"
+      integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script>
-      const music_input = document.querySelector("#music_meta");
+      let data = "";
+      let at;
+      let input = $("#music-input").val();
+
+      // * this function will run as soon as script loaded.
+      // * data is a array. a list of track. FRONTEND
+      // * at means access token. coming from backend database table token
+      (function() {
+        $.get("/api/guest", function(response) {
+          data = response.data;
+          at = response.token[0].accessToken;
+          console.log(response);
+          console.log(data);
+          console.log(at);
+        });
+      })();
+      // Autocomplete. when guest input more than 3 characters , the function will be fired.
+      //function input{access token}(coming from the /api/guest) and {query term}
+      $("#music-input").autocomplete({
+        source: function(request, response) {
+          $.ajax({
+            type: "GET",
+            url: "https://api.spotify.com/v1/search",
+            headers: {
+              Authorization: `Bearer ${at}`,
+              Accept: "application/json",
+              "Content-Type": "application/json"
+            },
+            data: {
+              type: "track",
+              q: request.term,
+              limit: 10,
+              market: "US",
+              offset: 3
+            },
+            success: function(data) {
+              response(
+                // console.log(data.tracks.items)
+                $.map(data.tracks.items, function(item) {
+                  console.log(item.artists);
+                  return {
+                    lable: `${item.name} by ${item.artists[0].name}`,
+                    value: `${item.name} by ${item.artists[0].name}`,
+                    id: item.id
+                  };
+                })
+              );
+            }
+          });
+        },
+        minLength: 3,
+        select: function(event, ui) {
+          $("#music-input").val(ui.item.value);
+          window.location.href = "#" + ui.item.id;
+        }
+      });
+
+      document.getElementById("addSong").addEventListener(
+        "click",
+        function() {
+          $.ajax({
+            url: "/refresh_token",
+            data: {
+              refresh_token: refresh_token
+            }
+          }).done(function(data) {
+            access_token = data.access_token;
+            oauthPlaceholder.innerHTML = oauthTemplate({
+              access_token: access_token,
+              refresh_token: refresh_token
+            });
+          });
+        },
+        false
+      );
     </script>
   </body>
 </html>

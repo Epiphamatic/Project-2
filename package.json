@@ -21,6 +21,7 @@
     "querystring": "^0.2.0",
     "request": "^2.88.0",
     "sequelize": "^4.41.2",
+    "sequelize-cli": "^5.4.0",
     "spotify-web-api-node": "^4.0.0"
   },
   "devDependencies": {
