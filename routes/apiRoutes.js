@@ -1,14 +1,8 @@
 const fetch = require("node-fetch");
 // Requiring our Playlist model
 const db = require("../models");
-//server-side access token
-let at = "";
-//server-side refresh token
-let rt = "";
-//server-side user_id
-let user_id = "";
-//server-side playlist_id
-let playlist_id = "";
+// server side access token
+let at;
 //rankup trigger
 let upTrigger;
 //rankdown trigger
@@ -45,12 +39,31 @@ module.exports = function(app) {
   //       .catch(function (err) {
   //         console.error('Error occurred: ' + err);
   //       });
-  // Token Qi's way
+  // * Token Qi's way
+  // * Store the token in database.
+  // * Only the current token stored. Expired one always get updated.
   app.post("/api/token", function(req, res) {
-    console.log(req.body);
     at = req.body.access_token;
-    rt = req.body.refresh_token;
-    user_id = req.body.spotify_user_id;
+    let user_id = req.body.spotify_user_id;
+    db.Token.findOne({ where: { id: 1 } }).then(function(theOne) {
+      if (theOne) {
+        db.Token.update(
+          {
+            accessToken: req.body.access_token,
+            refreshToken: req.body.refresh_token,
+            hostId: req.body.spotify_user_id
+          },
+          { where: { id: 1 } }
+        );
+      } else {
+        db.Token.create({
+          accessToken: req.body.access_token,
+          refreshToken: req.body.refresh_token,
+          hostId: req.body.spotify_user_id
+        });
+      }
+    });
+
     fetch(`https://api.spotify.com/v1/users/${user_id}/playlists`, {
       headers: { Authorization: `Bearer ${at}` }
     })
@@ -72,7 +85,7 @@ module.exports = function(app) {
 
   //reason not use spotify-web-api-node, IT IS NOT WORK!!!
   app.post("/api/tracks", function(req, res) {
-    playlist_id = req.body.playlistid;
+    let playlist_id = req.body.playlistid;
     fetch(`https://api.spotify.com/v1/playlists/${playlist_id}/tracks`, {
       headers: { Authorization: `Bearer ${at}` }
     })
@@ -90,10 +103,22 @@ module.exports = function(app) {
         });
         db.Playlist.bulkCreate(trackdata).then(() => {
           return;
-          // db.Playlist.findAll({}).then(data => {
-          //   console.log(data);
-          // });
         });
       });
+  });
+
+  //*****************************************OAuth bridge End*********************************************//
+  // * When guest.html loaded, it will automatically to fire this API Call.
+  // * The API's response is a wrapper of tracks inside the playlist table and current token inside the token table.
+  // * Magic promise.Great!
+  app.get("/api/guest", function(req, res) {
+    let dataAndToken = {};
+    db.Playlist.findAll({}).then(function(tracks) {
+      db.Token.findAll({}).then(function(token) {
+        dataAndToken.data = tracks;
+        dataAndToken.token = token;
+        res.json(dataAndToken);
+      });
+    });
   });
 };
