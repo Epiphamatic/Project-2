@@ -14,7 +14,8 @@ module.exports = function(sequelize, DataTypes) {
     },
     playlistId: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
+      defaultValue: "placeholder"
     }
   });
   return Token;

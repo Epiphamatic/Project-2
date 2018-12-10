@@ -86,6 +86,7 @@ module.exports = function(app) {
   //reason not use spotify-web-api-node, IT IS NOT WORK!!!
   app.post("/api/tracks", function(req, res) {
     let playlist_id = req.body.playlistid;
+    db.Token.update({ playlistId: playlist_id }, { where: { id: 1 } });
     fetch(`https://api.spotify.com/v1/playlists/${playlist_id}/tracks`, {
       headers: { Authorization: `Bearer ${at}` }
     })
