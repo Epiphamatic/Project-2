@@ -11,7 +11,7 @@ let at;
 //rankup trigger
 let upTrigger;
 //rankdown trigger
-let downTrigger;
+const downTrigger = 3;
 // Magic spotify, need huge improvement on this part document!!!
 // I have to use a different package axios to fetch. Node-fetch just not work.
 function refreshSpotifyToken() {
@@ -31,7 +31,7 @@ function refreshSpotifyToken() {
     }
   })
     .then(function(response) {
-      console.log(response.data.access_token);
+      //! console.log(response.data.access_token);
       db.Token.update(
         { accessToken: response.data.access_token },
         { where: { id: 1 } }
@@ -41,23 +41,40 @@ function refreshSpotifyToken() {
 }
 
 function deleteFromSpotify(songId) {
-  fetch(`https://api.spotify.com/v1/playlists/${playlist_id}/tracks`, {
-    method: "DELETE",
-    body: songId,
-    headers: {
-      Authorization: `Bearer ${at}`,
-      "Content-Type": "application/json"
-    }
+  let spotifyPlaylistId;
+  let spotifyAccessToken;
+  db.Token.findOne({ where: { id: 1 } }).then(data => {
+    spotifyPlaylistId = data.playlistId;
+    spotifyAccessToken = data.accessToken;
+    fetch(`https://api.spotify.com/v1/playlists/${spotifyPlaylistId}/tracks`, {
+      method: "DELETE",
+      body: songId,
+      headers: {
+        Authorization: `Bearer ${spotifyAccessToken}`,
+        "Content-Type": "application/json"
+      }
+    })
+      .then(response => response.json())
+      .then(data => console.log(data))
+      .catch(err => console.log(err));
   });
 }
-function deleteFromDatabase() {}
-module.exports = function(app) {
-  // Get all examples
-  app.get("/api/examples", function(req, res) {
-    db.Example.findAll({}).then(function(dbExamples) {
-      res.json(dbExamples);
+function deleteFromDatabase(db_id) {
+  let uri;
+  db.Playlist.findOne({ where: { id: db_id } })
+    .then(data => {
+      uri = JSON.stringify({ tracks: [{ uri: data.uri }] });
+      if (data.downcount < downTrigger) {
+        return;
+      }
+      db.Playlist.destroy({ where: { id: db_id } });
+      deleteFromSpotify(uri);
+    })
+    .catch(err => {
+      console.log(err);
     });
-  });
+}
+module.exports = function(app) {
   // Token Kamakshi's way with useid and token deleted
   // *************kamakshi1******************
   // Create a new example
@@ -110,12 +127,26 @@ module.exports = function(app) {
   // Put-thumbUp-thumbDown
   // Action option: thumbup , thumbdown
 
-  app.put("/api/:action/:id", function(req, res) {
+  app.get("/api/:action/:id", function(req, res) {
     let upORdown = req.params.action;
+    let db_id = req.params.id;
     if (upORdown === "thumbup") {
-      db.Playlist.increment("upcount", { where: { id: req.params.id } });
+      db.Playlist.findOne({ where: { id: parseInt(req.params.id) } }).then(
+        song => {
+          return song.increment("upcount");
+        }
+      );
     } else {
-      db.Playlist.increment("downcount", { where: { id: req.params.id } });
+      db.Playlist.findOne({ where: { id: parseInt(req.params.id) } })
+        .then(song => {
+          return song.increment("downcount");
+        })
+        .then(() => {
+          deleteFromDatabase(db_id);
+        })
+        .catch(err => {
+          throw new Error("ID not exist");
+        });
     }
   });
 
