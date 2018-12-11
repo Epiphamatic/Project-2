@@ -5,13 +5,17 @@ const client_secret = keys.secret;
 const fetch = require("node-fetch");
 // Requiring our Playlist model
 const db = require("../models");
+//axios is dedicated for refresh the Spotify Token
 const axios = require("axios");
+
 // server side access token
 let at;
 //rankup trigger
 let upTrigger;
 //rankdown trigger
 const downTrigger = 3;
+//Deleted Song's ID
+let databaseDeletedSongId = [];
 // Magic spotify, need huge improvement on this part document!!!
 // I have to use a different package axios to fetch. Node-fetch just not work.
 function refreshSpotifyToken() {
@@ -67,7 +71,10 @@ function deleteFromDatabase(db_id) {
       if (data.downcount < downTrigger) {
         return;
       }
-      db.Playlist.destroy({ where: { id: db_id } });
+      db.Playlist.destroy({ where: { id: db_id } }).then(() => {
+        databaseDeletedSongId.push(parseInt(data.id));
+      });
+
       deleteFromSpotify(uri);
     })
     .catch(err => {
@@ -130,6 +137,8 @@ module.exports = function(app) {
   app.get("/api/:action/:id", function(req, res) {
     let upORdown = req.params.action;
     let db_id = req.params.id;
+    console.log(db_id);
+    console.log(databaseDeletedSongId);
     if (upORdown === "thumbup") {
       db.Playlist.findOne({ where: { id: parseInt(req.params.id) } }).then(
         song => {
@@ -137,16 +146,20 @@ module.exports = function(app) {
         }
       );
     } else {
-      db.Playlist.findOne({ where: { id: parseInt(req.params.id) } })
-        .then(song => {
-          return song.increment("downcount");
-        })
-        .then(() => {
-          deleteFromDatabase(db_id);
-        })
-        .catch(err => {
-          throw new Error("ID not exist");
-        });
+      if (databaseDeletedSongId.indexOf(parseInt(db_id)) !== -1) {
+        return;
+      } else {
+        db.Playlist.findOne({ where: { id: parseInt(req.params.id) } })
+          .then(song => {
+            return song.increment("downcount");
+          })
+          .then(() => {
+            deleteFromDatabase(db_id);
+          })
+          .catch(err => {
+            throw new Error("ID not exist");
+          });
+      }
     }
   });
 
