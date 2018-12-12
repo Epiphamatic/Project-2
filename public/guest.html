@@ -18,7 +18,9 @@
     />
   </head>
   <body>
-    <button id="addSong">Add Song</button>
+    <button id="addSong" data-songid="3" data-action="thumbdown">
+      Test Button
+    </button>
     <form>
       <input type="text" id="music-input" placeholder="Enter Song Name" />Input
       Music Name <br />
@@ -92,17 +94,8 @@
       document.getElementById("addSong").addEventListener(
         "click",
         function() {
-          $.ajax({
-            url: "/refresh_token",
-            data: {
-              refresh_token: refresh_token
-            }
-          }).done(function(data) {
-            access_token = data.access_token;
-            oauthPlaceholder.innerHTML = oauthTemplate({
-              access_token: access_token,
-              refresh_token: refresh_token
-            });
+          $.get("/api/thumbdown/12").then(function(data) {
+            return;
           });
         },
         false
