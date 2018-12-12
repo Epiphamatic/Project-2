@@ -43,6 +43,7 @@ if (error) {
         showHide();
         console.log("this is the your list");
         console.log(response);
+        playlistCreate(response);
       });
     });
   } else {
@@ -51,17 +52,48 @@ if (error) {
     $("#granted").hide();
   }
 
-  document
-    .getElementById("chosenPlaylist")
-    .addEventListener("click", function () {
-      $.ajax("/api/tracks", {
-        type: "POST",
-        data: { playlistid: $("#chosenPlaylist").data("playlistid") }
-      }).then(function (response) {
-        console.log(response);
-      });
+//   document
+//     .getElementsById("chosenPlaylist")
+//     .addEventListener("click", function () {
+//       $.ajax("/api/tracks", {
+//         type: "POST",
+//         data: { playlistid: $("#chosenPlaylist").data("playlistid") }
+//       }).then(function (response) {
+//         console.log(response);
+//       });
+//     });
+// }
+
+//  Testing Tri
+
+var playlistClick = function() {
+
+  $.ajax("/api/tracks", {
+      type: "POST",
+      data: { playlistid: $(this).data("playlistid") }
+    }).then(function(response) {
+      console.log(response);
     });
+
+    // songShow();
 }
+
+var playlistCreate = function(res) {
+
+for (var i = 0; i < res.items.length; i++) {
+
+  var playlist = $("<button type = 'button' class = 'btn btn-secondary chosenPlaylist' data-playlistid =" + res.items[i].id + ">" + res.items[i].name + "</button> <br>");
+
+  $(".granted").append(playlist);
+
+}
+}
+
+$(document).on("click", ".chosenPlaylist", playlistClick);
+
+
+
+
 //kamakshi's**********************************
 function addToPlayList() {
   alert("Please 1");
@@ -73,6 +105,7 @@ function addToPlayList() {
   while ((e = r.exec(q))) {
     hashParams[e[1]] = decodeURIComponent(e[2]);
   }
+}
 
   //  alert("Please 2");
   var access_token = hashParams.access_token;
