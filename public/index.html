@@ -35,80 +35,19 @@
         >
           chosen playlist
         </button>
+        <!-- Adding this to test add track to playlist - KA-->
+        <form>
+          <input type="text" id="music_name" name="music_name" placeholder=" Type music">
+          <button type="submit" id="submit" class=" btn-success btn-lg">Search</button>
+        </form>
       </div>
     </div>
+    <!-- moved all javascript to separate js file - KA -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript"></script>
+    <script src="js/index.js"></script>
 
-    <script
-      src="https://code.jquery.com/jquery-3.3.1.min.js"
-      integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-      crossorigin="anonymous"
-    ></script>
-
-    <script type="text/javascript">
-      (function() {
-        function getHashParams() {
-          var hashParams = {};
-          var e,
-            r = /([^&;=]+)=?([^&;]*)/g,
-            q = window.location.hash.substring(1);
-          while ((e = r.exec(q))) {
-            hashParams[e[1]] = decodeURIComponent(e[2]);
-          }
-          return hashParams;
-        }
-        function showHide() {
-          $("#grant").hide();
-          $("#granted").show();
-        }
-        var params = getHashParams();
-        var access_token = params.access_token,
-          refresh_token = params.refresh_token,
-          error = params.error;
-        var hostId;
-        if (error) {
-          alert("There was an error during the authentication");
-        } else {
-          if (access_token) {
-            $.ajax({
-              url: "https://api.spotify.com/v1/me",
-              method: "GET",
-              headers: {
-                Authorization: "Bearer " + access_token
-              }
-            }).then(function(response) {
-              hostId = response.id;
-              console.log("this is host's Id" + hostId);
-              $.ajax("/api/token", {
-                type: "POST",
-                data: {
-                  access_token: access_token,
-                  refresh_token: refresh_token,
-                  spotify_user_id: hostId
-                }
-              }).then(function(response) {
-                showHide();
-                console.log("this is the your list");
-                console.log(response);
-              });
-            });
-          } else {
-            // render initial screen
-            $("#grant").show();
-            $("#granted").hide();
-          }
-
-          document
-            .getElementById("chosenPlaylist")
-            .addEventListener("click", function() {
-              $.ajax("/api/tracks", {
-                type: "POST",
-                data: { playlistid: $("#chosenPlaylist").data("playlistid") }
-              }).then(function(response) {
-                console.log(response);
-              });
-            });
-        }
-      })();
-    </script>
+   
+   
   </body>
 </html>

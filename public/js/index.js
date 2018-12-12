@@ -1,99 +1,98 @@
-// Get references to page elements
-var $exampleText = $("#example-text");
-var $exampleDescription = $("#example-description");
-var $submitBtn = $("#submit");
-var $exampleList = $("#example-list");
 
-// The API object contains methods for each kind of request we'll make
-var API = {
-  saveExample: function(example) {
-    return $.ajax({
+
+function getHashParams() {
+  var hashParams = {};
+  var e,
+    r = /([^&;=]+)=?([^&;]*)/g,
+    q = window.location.hash.substring(1);
+  while ((e = r.exec(q))) {
+    hashParams[e[1]] = decodeURIComponent(e[2]);
+  }
+  return hashParams;
+}
+function showHide() {
+  $("#grant").hide();
+  $("#granted").show();
+}
+var params = getHashParams();
+var access_token = params.access_token,
+  refresh_token = params.refresh_token,
+  error = params.error;
+var hostId;
+if (error) {
+  alert("There was an error during the authentication");
+} else {
+  if (access_token) {
+    $.ajax({
+      url: "https://api.spotify.com/v1/me",
+      method: "GET",
       headers: {
-        "Content-Type": "application/json"
-      },
-      type: "POST",
-      url: "api/examples",
-      data: JSON.stringify(example)
+        Authorization: "Bearer " + access_token
+      }
+    }).then(function (response) {
+      hostId = response.id;
+      console.log("this is host's Id" + hostId);
+      $.ajax("/api/token", {
+        type: "POST",
+        data: {
+          access_token: access_token,
+          refresh_token: refresh_token,
+          spotify_user_id: hostId
+        }
+      }).then(function (response) {
+        showHide();
+        console.log("this is the your list");
+        console.log(response);
+      });
     });
-  },
-  getExamples: function() {
-    return $.ajax({
-      url: "api/examples",
-      type: "GET"
-    });
-  },
-  deleteExample: function(id) {
-    return $.ajax({
-      url: "api/examples/" + id,
-      type: "DELETE"
-    });
-  }
-};
-
-// refreshExamples gets new examples from the db and repopulates the list
-var refreshExamples = function() {
-  API.getExamples().then(function(data) {
-    var $examples = data.map(function(example) {
-      var $a = $("<a>")
-        .text(example.text)
-        .attr("href", "/example/" + example.id);
-
-      var $li = $("<li>")
-        .attr({
-          class: "list-group-item",
-          "data-id": example.id
-        })
-        .append($a);
-
-      var $button = $("<button>")
-        .addClass("btn btn-danger float-right delete")
-        .text("ｘ");
-
-      $li.append($button);
-
-      return $li;
-    });
-
-    $exampleList.empty();
-    $exampleList.append($examples);
-  });
-};
-
-// handleFormSubmit is called whenever we submit a new example
-// Save the new example to the db and refresh the list
-var handleFormSubmit = function(event) {
-  event.preventDefault();
-
-  var example = {
-    text: $exampleText.val().trim(),
-    description: $exampleDescription.val().trim()
-  };
-
-  if (!(example.text && example.description)) {
-    alert("You must enter an example text and description!");
-    return;
+  } else {
+    // render initial screen
+    $("#grant").show();
+    $("#granted").hide();
   }
 
-  API.saveExample(example).then(function() {
-    refreshExamples();
+  document
+    .getElementById("chosenPlaylist")
+    .addEventListener("click", function () {
+      $.ajax("/api/tracks", {
+        type: "POST",
+        data: { playlistid: $("#chosenPlaylist").data("playlistid") }
+      }).then(function (response) {
+        console.log(response);
+      });
+    });
+}
+//kamakshi's**********************************
+function addToPlayList() {
+  alert("Please 1");
+  // var params = getHashParams();
+  var hashParams = {};
+  var e,
+    r = /([^&;=]+)=?([^&;]*)/g,
+    q = window.location.hash.substring(1);
+  while ((e = r.exec(q))) {
+    hashParams[e[1]] = decodeURIComponent(e[2]);
+  }
+
+  //  alert("Please 2");
+  var access_token = hashParams.access_token;
+  // alert("Please 3"+access_token);
+  var refresh_token = hashParams.refresh_token;
+  // alert("Please 4"+refresh_token);
+  // var error = hashParams.error;
+  alert("Please 5");
+  $.ajax("/music/add/", {
+    type: "POST",
+    data: {
+      access_token: access_token,
+      refresh_token: refresh_token,
+      spotify_user_id: hostId
+    }
+  }).then(function (response) {
+    //  showHide();
+    // console.log("this is the your list*******" + response);
+    //console.log(response);
   });
+}
 
-  $exampleText.val("");
-  $exampleDescription.val("");
-};
-
-// handleDeleteBtnClick is called when an example's delete button is clicked
-// Remove the example from the db and refresh the list
-var handleDeleteBtnClick = function() {
-  var idToDelete = $(this)
-    .parent()
-    .attr("data-id");
-
-  API.deleteExample(idToDelete).then(function() {
-    refreshExamples();
-  });
-};
-
-// Add event listeners to the submit and delete buttons
-$submitBtn.on("click", handleFormSubmit);
-$exampleList.on("click", ".delete", handleDeleteBtnClick);
+$(document).on("click", "#submit", addToPlayList);
