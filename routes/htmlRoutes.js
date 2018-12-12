@@ -140,6 +140,7 @@ module.exports = function(app) {
   app.get("/guest", function(req, res) {
     res.sendFile("/guest.html", { root: "./public" });
   });
+
   // Render 404 page for any unmatched routes
   app.get("*", function(req, res) {
     res.sendFile("/404.html", { root: "./public" });
