@@ -1,0 +1,5 @@
+$(".thumbsUp").onclickon('click', function(){
+
+
+
+});

@@ -57,10 +57,11 @@ module.exports = function(app) {
   });
 
   //reason not use spotify-web-api-node, IT IS NOT WORK!!!
+  try {
   app.post("/api/tracks", function(req, res) {
     playlist_id = req.body.playlistid;
     // console.log(playlist_id);
-    fetch(`https://api.spotify.com/v1/playlists/${playlist_id}/tracks`, {
+    fetch(`https://api.spotify.com/v1/playlists/${playlist_id}/tracks?limit=30`, {
       headers: { Authorization: `Bearer ${at}` }
     })
       .then(response => response.json())
@@ -82,5 +83,8 @@ module.exports = function(app) {
           // });
         });
       });
-  });
+  })}
+  catch (err) {
+    console.log(err);
+  }
 };

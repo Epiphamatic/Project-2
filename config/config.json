@@ -1,14 +1,14 @@
 {
   "development": {
     "username": "root",
-    "password": "woaiwojia8",
+    "password": "",
     "database": "hype",
     "host": "localhost",
     "dialect": "mysql"
   },
   "test": {
     "username": "root",
-    "password": null,
+    "password": "",
     "database": "testdb",
     "host": "localhost",
     "dialect": "mysql",

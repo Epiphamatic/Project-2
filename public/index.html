@@ -11,31 +11,40 @@
       crossorigin="anonymous"
     />
 
+    <script
+      src="https://code.jquery.com/jquery-3.3.1.min.js"
+      integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- javascript -->
+    <script type="text/javascript" src="./js/main.js"></script>
+
     <title>Document</title>
   </head>
   <body>
     <div class="container">
-      <div id="grant">
+      <div class="grant">
         <a
           id="btn-grant-access"
           class="btn btn-primary"
           href="http://localhost:10010/login"
           role="button"
-          >Grant Access</a
-        >
+          >Grant Access</a>
       </div>
 
-      <div id="granted">
+      <div class="granted">
         <h1>Successfully Grant the Access</h1>
-        <button
+        <!-- <button
           id="chosenPlaylist"
           data-playlistid="6A0aiBlfmdQ6aDfaxAjey1"
           type="button"
           class="btn btn-secondary"
         >
           chosen playlist
-        </button>
+        </button> -->
       </div>
+
     </div>
 
     <script
@@ -45,6 +54,7 @@
     ></script>
 
     <script type="text/javascript">
+
       (function() {
         function getHashParams() {
           var hashParams = {};
@@ -57,8 +67,8 @@
           return hashParams;
         }
         function showHide() {
-          $("#grant").hide();
-          $("#granted").show();
+          $(".grant").hide();
+          $(".granted").show();
         }
         var params = getHashParams();
         var access_token = params.access_token,
@@ -89,25 +99,59 @@
                 showHide();
                 console.log("this is the your list");
                 console.log(response);
+                playlistCreate(response);
+
               });
             });
           } else {
             // render initial screen
-            $("#grant").show();
-            $("#granted").hide();
+            $(".grant").show();
+            $(".granted").hide();
           }
+          
+          
+          var playlistClick = function() {
 
-          document
-            .getElementById("chosenPlaylist")
-            .addEventListener("click", function() {
-              $.ajax("/api/tracks", {
+            $.ajax("/api/tracks", {
                 type: "POST",
-                data: { playlistid: $("#chosenPlaylist").data("playlistid") }
+                data: { playlistid: $(this).data("playlistid") }
               }).then(function(response) {
                 console.log(response);
               });
-            });
+
+              // songShow();
+          }
         }
+
+        var playlistCreate = function(res) {
+
+          for (var i = 0; i < res.items.length; i++) {
+
+            var playlist = $("<button type = 'button' class = 'btn btn-secondary chosenPlaylist' data-playlistid =" + res.items[i].id + ">" + res.items[i].name + "</button>");
+
+            $(".granted").append(playlist);
+
+          }
+        }
+
+        $(document).on("click", ".chosenPlaylist", playlistClick);
+
+      //  var songShow = function() {
+
+      //   // $(".granted").empty();
+
+      //   for (var i = 0; i < db.Playlist.length; i++) {
+
+      //     // var playlist = $("<button>" + db.Playlist[i].name + "</button>");
+
+      //     // $(".granted").append(playlist);
+
+      //     console.log(db.Playlist.name[i]);
+
+      //   };
+
+      //  }
+
       })();
     </script>
   </body>
