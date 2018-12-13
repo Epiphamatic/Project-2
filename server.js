@@ -4,6 +4,7 @@ const cookieParser = require("cookie-parser");
 const db = require("./models");
 const app = express();
 const exphbs = require("express-handlebars");
+var bodyParser = require('body-parser')
 var PORT = process.env.PORT || 10010;
 
 // Middleware
@@ -14,6 +15,12 @@ app
   .use(express.json())
   .use(cookieParser());
 
+
+  app.use( bodyParser.json() );       // to support JSON-encoded bodies
+  app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
+    extended: false
+  })); 
+  
 // Routes
 require("./routes/apiRoutes")(app);
 require("./routes/htmlRoutes")(app);
