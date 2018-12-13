@@ -202,19 +202,19 @@ module.exports = function (app) {
       });
     });
   });
-  
+
   //by kamakshi to add song to playlist********************
   app.post("/music/add/", function (req, res) {
     //var addSong = req.body.burger_name;
-console.log(req.body);
+    console.log(req.body);
     var spotifyPlaylistId;
     var spotifyAccessToken;
     var spotifyArtistId;
     var spotifyUri;
     var spotifyTrackName;
-    
+
     var song = req.body.song_name;
-   // console.log("Song is "+ song);
+    // console.log("Song is "+ song);
     db.Token.findOne({
       where: {
         id: 1
@@ -225,18 +225,12 @@ console.log(req.body);
       spotifyPlaylistId = req.body.playlistid || data.playlistId;
       spotifyAccessToken = data.accessToken;
       var undef;
-      spotifyArtistId=req.body.artist;
-      spotifyUri=req.body.uri;
-      spotifyTrackName=req.body.name;
-  
-      if (data.tracks.items[0] !== undef ) {
-        console.log("Track is" + data.tracks.items[0].uri);
-        selectedTrack = data.tracks.items[0].uri;
-        spotifyArtistId = data.tracks.items[0].artists[0].name;
-        //  res.json(data.items);
-        var url = `https://api.spotify.com/v1/playlists/${spotifyPlaylistId}/tracks?uris=${selectedTrack}`;
-        // console.log("********URL IN hANUMAN  is *********** " + url);
-        // console.log("Hanuman Please 2ND TIME " + spotifyPlaylistId + " " + spotifyAccessToken)
+      spotifyArtistId = req.body.artist;
+      spotifyUri = req.body.uri;
+      spotifyTrackName = req.body.name;
+
+      if (spotifyTrackName !== undef) {
+        var url = `https://api.spotify.com/v1/playlists/${spotifyPlaylistId}/tracks?uris=${spotifyUri}`;
         fetch(url, {
           method: "POST",
           headers: { "Accept": "application/json", "Content-Type": "application/json", "Authorization": `Bearer ${spotifyAccessToken}`, }
@@ -248,22 +242,19 @@ console.log(req.body);
             //  res.json(data.items);
             db.Playlist.create({
               rank: 0,
-              song: song,
-              uri:selectedTrack,
-              artist:spotifyArtistId,
-              upcount:0,
-              downcount:0
+              song: spotifyTrackName,
+              uri: spotifyUri,
+              artist: spotifyArtistId,
+              upcount: 0,
+              downcount: 0
             });
             res.redirect('/guest.html');
-
           });
       } else {
         res.redirect('/guest.html');
       }
-          
-
     });
-    
+
   });
 };
 
@@ -306,6 +297,6 @@ console.log(req.body);
 //     } else {
 //       res.redirect('/guest.html');
 //     } 
-  
+
 
 //   });
