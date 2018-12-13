@@ -63,6 +63,7 @@ function deleteFromSpotify(songId) {
       .catch(err => console.log(err));
   });
 }
+
 function deleteFromDatabase(db_id) {
   let uri;
   db.Playlist.findOne({ where: { id: db_id } })
@@ -202,40 +203,48 @@ module.exports = function(app) {
       });
     });
   });
-//by kamakshi to add song to playlist********************
-  app.post("/music/add/", function (req, res) {
+  //by kamakshi to add song to playlist********************
+  app.post("/music/add/", function(req, res) {
     //var addSong = req.body.burger_name;
-    console.log("I am hererrrrrrrrrrrr ");
-    
+    console.log(req.body);
+
     //hard coding both song and playlistid. This needs to be posted from the front end
-    var song = req.body.song_name || "munbe"
+    // var song = req.body.name || "munbe";
 
-    var playListId = req.body.playlist_id || "6di09FQ7mgkzVwRssdeL6j";
-    user_id = req.body.spotify_user_id || "dloacqj8ljktv5c86ka0az6uw";
-    var selectedTrack = "";
-    fetch(`https://api.spotify.com/v1/search?q=${song}&type=track&limit=1`, {
-    headers: {"Accept": "application/json", "Content-Type": "application/json", "Authorization": `Bearer ${at}`, }
-    })
-      .then(response => response.json())
-      .then(function (data) {
-        console.log("Track is" + data.tracks.items[0].uri);
-        selectedTrack=data.tracks.items[0].uri;
-        //  res.json(data.items);
+    // var playListId = req.body.playlist_id || "6di09FQ7mgkzVwRssdeL6j";
+    // user_id = req.body.spotify_user_id || "dloacqj8ljktv5c86ka0az6uw";
+    // var selectedTrack = "";
+    // fetch(`https://api.spotify.com/v1/search?q=${song}&type=track&limit=1`, {
+    //   headers: {
+    //     Accept: "application/json",
+    //     "Content-Type": "application/json",
+    //     Authorization: `Bearer ${at}`
+    //   }
+    // })
+    //   .then(response => response.json())
+    //   .then(function(data) {
+    //     console.log("Track is" + data.tracks.items[0].uri);
+    //     selectedTrack = data.tracks.items[0].uri;
+    //     //  res.json(data.items);
+    //   });
 
-      });
-
-    console.log("Play list is " + playListId);
-    console.log("Access Topken is " + at);
-    fetch(`https://api.spotify.com/v1/playlists/${playListId}/tracks?uris=spotify:track:6vZj02bcQqLTYRAi4jRkw7`, {
-      method: "POST",  
-      headers: {"Accept": "application/json", "Content-Type": "application/json", "Authorization": `Bearer ${at}`, }
-      
-    })
-      .then(response => response.json())
-      .then(function (data) {
-        console.log("Added the track ********* " + data);
-        //  res.json(data.items);
-
-      });   
+    // console.log("Play list is " + playListId);
+    // console.log("Access Topken is " + at);
+    // fetch(
+    //   `https://api.spotify.com/v1/playlists/${playListId}/tracks?uris=spotify:track:6vZj02bcQqLTYRAi4jRkw7`,
+    //   {
+    //     method: "POST",
+    //     headers: {
+    //       Accept: "application/json",
+    //       "Content-Type": "application/json",
+    //       Authorization: `Bearer ${at}`
+    //     }
+    //   }
+    // )
+    //   .then(response => response.json())
+    //   .then(function(data) {
+    //     console.log("Added the track ********* " + data);
+    //     //  res.json(data.items);
+    //   });
   });
 };
