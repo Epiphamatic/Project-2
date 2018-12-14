@@ -155,9 +155,20 @@
         console.log(Action);
         console.log(id);
 
+        var songClick = $(this);
+
+        console.log(songClick);
+
+        var disableSong = function(song) {
+
+          song.hide();
+          song.text("1");
+
+        };
+
         $.get("/api/" + Action + "/" + id, function(data) {
           return;
-        })
+        }).then(disableSong(songClick));
       };
 
       $(document).on("click", ".fas", songVote);
