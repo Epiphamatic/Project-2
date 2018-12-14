@@ -63,6 +63,7 @@ function deleteFromSpotify(songId) {
       .catch(err => console.log(err));
   });
 }
+
 function deleteFromDatabase(db_id) {
   let uri;
   db.Playlist.findOne({ where: { id: db_id } })
@@ -202,7 +203,6 @@ module.exports = function (app) {
       });
     });
   });
-
   //by kamakshi to add song to playlist********************
   app.post("/music/add/", function (req, res) {
     //var addSong = req.body.burger_name;
@@ -254,7 +254,6 @@ module.exports = function (app) {
         res.redirect('/guest.html');
       }
     });
-
   });
 };
 
