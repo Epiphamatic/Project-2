@@ -82,7 +82,7 @@ var playlistCreate = function(res) {
 
 for (var i = 0; i < res.items.length; i++) {
 
-  var playlist = $("<button type = 'button' class = 'btn btn-secondary chosenPlaylist' data-playlistid =" + res.items[i].id + ">" + res.items[i].name + "</button> <br>");
+  var playlist = $("<button type = 'button' class = 'btn btn-light chosenPlaylist' data-playlistid =" + res.items[i].id + ">" + res.items[i].name + "</button>");
 
   $(".granted").append(playlist);
 
