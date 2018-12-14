@@ -9,6 +9,10 @@
       .ui-helper-hidden-accessible {
         display: none;
       }
+      /* searchSuggest can be used defind the style of the autocomplete style */
+      .searchSuggest {
+        background-color: rgb(148, 129, 165);
+      }
     </style>
     <link
       href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
@@ -70,14 +74,17 @@
               offset: 3
             },
             success: function(data) {
+              console.log(data.tracks.items);
               response(
-                // console.log(data.tracks.items)
                 $.map(data.tracks.items, function(item) {
-                  console.log(item.artists);
+                  // console.log(item.artists);
                   return {
                     lable: `${item.name} by ${item.artists[0].name}`,
                     value: `${item.name} by ${item.artists[0].name}`,
-                    id: item.id
+                    id: item.id,
+                    meta_name: `${item.name}`,
+                    meta_uri: `${item.uri}`,
+                    meta_artist: `${item.artists[0].name}`
                   };
                 })
               );
@@ -87,9 +94,28 @@
         minLength: 3,
         select: function(event, ui) {
           $("#music-input").val(ui.item.value);
-          window.location.href = "#" + ui.item.id;
+          // console.log(ui.item.meta_uri);
+          let meta_data = {
+            name: ui.item.meta_name,
+            artist: ui.item.meta_artist,
+            uri: ui.item.meta_uri
+          };
+          console.log(meta_data);
+          (function() {
+            console.log("111111");
+          })();
+          $.post("/music/add", meta_data).then(function(meta_data) {
+            console.log("new music added" + meta_data);
+          });
         }
       });
+      $.ui.autocomplete.prototype._renderItem = function(ul, item) {
+        console.log(item);
+        return $("<li>")
+          .addClass("searchSuggest")
+          .text(`${item.lable}`)
+          .appendTo(ul);
+      };
 
       document.getElementById("addSong").addEventListener(
         "click",
@@ -100,6 +126,7 @@
         },
         false
       );
+      //tracking info
     </script>
   </body>
 </html>

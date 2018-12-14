@@ -63,6 +63,7 @@ function deleteFromSpotify(songId) {
       .catch(err => console.log(err));
   });
 }
+
 function deleteFromDatabase(db_id) {
   let uri;
   db.Playlist.findOne({ where: { id: db_id } })
@@ -82,21 +83,6 @@ function deleteFromDatabase(db_id) {
     });
 }
 module.exports = function(app) {
-  // Token Kamakshi's way with useid and token deleted
-  // *************kamakshi1******************
-  // Create a new example
-  //   app.post("/api/token", function (req, res) {
-  //     var userid = req.body.userid || {deleted}
-  //     var token = req.body.token || {deleted}
-  //     spotify
-  //       .request('https://api.spotify.com/v1/users/' + userid + '/playlists')
-  //       .then(function (data) {
-  //         res.json(data);
-  //         console.log(data);
-  //       })
-  //       .catch(function (err) {
-  //         console.error('Error occurred: ' + err);
-  //       });
   // * Token Qi's way
   // * Store the token in database.
   // * Only the current token stored. Expired one always get updated.
@@ -202,40 +188,54 @@ module.exports = function(app) {
       });
     });
   });
-//by kamakshi to add song to playlist********************
-  app.post("/music/add/", function (req, res) {
+  //by kamakshi to add song to playlist********************
+  app.post("/music/add/", function(req, res) {
     //var addSong = req.body.burger_name;
-    console.log("I am hererrrrrrrrrrrr ");
-    
-    //hard coding both song and playlistid. This needs to be posted from the front end
-    var song = req.body.song_name || "munbe"
+    // console.log(req.body);
+    let spotifyPlaylistId;
+    let spotifyAccessToken;
+    let spotifyArtistId;
+    let spotifyUri;
+    let spotifyTrackName;
 
-    var playListId = req.body.playlist_id || "6di09FQ7mgkzVwRssdeL6j";
-    user_id = req.body.spotify_user_id || "dloacqj8ljktv5c86ka0az6uw";
-    var selectedTrack = "";
-    fetch(`https://api.spotify.com/v1/search?q=${song}&type=track&limit=1`, {
-    headers: {"Accept": "application/json", "Content-Type": "application/json", "Authorization": `Bearer ${at}`, }
-    })
-      .then(response => response.json())
-      .then(function (data) {
-        console.log("Track is" + data.tracks.items[0].uri);
-        selectedTrack=data.tracks.items[0].uri;
-        //  res.json(data.items);
+    var song = req.body.song_name;
+    db.Token.findOne({
+      where: {
+        id: 1
+      }
+    }).then(data => {
+      //Play list id also should be sent in body
+      spotifyPlaylistId = data.playlistId;
+      spotifyAccessToken = data.accessToken;
+      var undef;
+      spotifyArtistId = req.body.artist;
+      spotifyUri = req.body.uri;
+      spotifyTrackName = req.body.name;
 
-      });
-
-    console.log("Play list is " + playListId);
-    console.log("Access Topken is " + at);
-    fetch(`https://api.spotify.com/v1/playlists/${playListId}/tracks?uris=spotify:track:6vZj02bcQqLTYRAi4jRkw7`, {
-      method: "POST",  
-      headers: {"Accept": "application/json", "Content-Type": "application/json", "Authorization": `Bearer ${at}`, }
-      
-    })
-      .then(response => response.json())
-      .then(function (data) {
-        console.log("Added the track ********* " + data);
-        //  res.json(data.items);
-
-      });   
+      if (spotifyTrackName !== undef) {
+        var url = `https://api.spotify.com/v1/playlists/${spotifyPlaylistId}/tracks?uris=${spotifyUri}`;
+        fetch(url, {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${spotifyAccessToken}`
+          }
+        })
+          .then(response => response.json())
+          .then(function(data) {
+            console.log("Added the track ********* " + data);
+            //  res.json(data.items);
+            db.Playlist.create({
+              song: spotifyTrackName,
+              uri: spotifyUri,
+              artist: spotifyArtistId
+            });
+            res.redirect("/guest.html");
+          });
+      } else {
+        res.redirect("/guest.html");
+      }
+    });
   });
 };
