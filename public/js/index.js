@@ -76,16 +76,29 @@ var playlistClick = function() {
 };
 
 var playlistCreate = function(res) {
-  for (var i = 0; i < res.items.length; i++) {
-    var playlist = $(
-      "<button type = 'button' class = 'btn btn-secondary chosenPlaylist' data-playlistid =" +
-        res.items[i].id +
-        ">" +
-        res.items[i].name +
-        "</button> <br>"
-    );
 
-    $(".granted").append(playlist);
+for (var i = 0; i < res.items.length; i++) {
+
+  var playlist = $("<button type = 'button' class = 'btn btn-light chosenPlaylist' data-playlistid =" + res.items[i].id + ">" + res.items[i].name + "</button>");
+
+  $(".granted").append(playlist);
+
+}
+}
+
+$(document).on("click", ".chosenPlaylist", playlistClick);
+
+//kamakshi's**********************************
+function addToPlayList() {
+  alert("Please 1");
+  // var params = getHashParams();
+  var hashParams = {};
+  var e,
+    r = /([^&;=]+)=?([^&;]*)/g,
+    q = window.location.hash.substring(1);
+  while ((e = r.exec(q))) {
+    hashParams[e[1]] = decodeURIComponent(e[2]);
+
   }
 };
 
