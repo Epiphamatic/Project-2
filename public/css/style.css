@@ -98,6 +98,7 @@ body {
     text-align: center;
 }
 
+
 .accessHeader {
 
     color: white;
@@ -160,5 +161,78 @@ body {
     #grant {
 
         margin-top: 25vh;
+    }
+}
+
+/* Guest.html page styling */
+
+.searchResults {
+
+    width: 72.3vw;
+    position: relative;
+    left: -2.6vw;
+    font-size: 3vh;
+    padding-left: 1vw;
+    border-bottom: solid 1px rgba(50, 156, 255, 0.863);
+    border-radius: 2px;
+}
+
+.searchResults:hover {
+
+    background: rgb(215, 242, 253);
+}
+
+.songInput {
+
+    margin-bottom: 3vh;
+}
+
+.songDivHolder {
+
+    text-align: center;
+}
+
+.songDiv {
+
+    width: 100%;
+}
+
+.song {
+
+    color: black;
+    background: white;
+    margin-top: 2vh;
+    border-radius: 5px;
+    font-size: 5vh;
+    white-space: nowrap;
+}
+
+.thumbsUp {
+
+    color: greenyellow;
+    font-size: 6vh;
+    margin-top: 2vh;
+    line-height: 100%;
+}
+
+.thumbsDown {
+
+    color: red;
+    font-size: 6vh;
+    margin-top: 2vh;
+    line-height: 140%;
+}
+
+@media only screen and (max-width: 700px) {
+
+    .searchResults {
+
+        width: 91.2vw;
+        position: relative;
+        left: -11vw;
+        font-size: 3vh;
+        padding-left: 1vw;
+        border-bottom: solid 1px rgba(50, 156, 255, 0.863);
+        border-radius: 2px;
     }
 }

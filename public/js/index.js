@@ -50,17 +50,6 @@ if (error) {
     $("#granted").hide();
   }
 }
-//   document
-//     .getElementsById("chosenPlaylist")
-//     .addEventListener("click", function () {
-//       $.ajax("/api/tracks", {
-//         type: "POST",
-//         data: { playlistid: $("#chosenPlaylist").data("playlistid") }
-//       }).then(function (response) {
-//         console.log(response);
-//       });
-//     });
-// }
 
 //  Testing Tri
 
@@ -72,7 +61,6 @@ var playlistClick = function() {
     console.log(response);
   });
 
-  // songShow();
 };
 
 var playlistCreate = function(res) {
@@ -101,5 +89,3 @@ function addToPlayList() {
 
   }
 };
-
-$(document).on("click", ".chosenPlaylist", playlistClick);
