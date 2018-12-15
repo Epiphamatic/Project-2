@@ -65,9 +65,11 @@ if (error) {
 //  Testing Tri
 
 var playlistClick = function() {
+  alert("I am here");
   $.ajax("/api/tracks", {
     type: "POST",
     data: { playlistid: $(this).data("playlistid") }
+
   }).then(function(response) {
     console.log(response);
   });

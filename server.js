@@ -4,6 +4,7 @@ const cookieParser = require("cookie-parser");
 const db = require("./models");
 const app = express();
 const exphbs = require("express-handlebars");
+//var bodyParser = require('body-parser');
 var PORT = process.env.PORT || 10010;
 
 // Middleware
@@ -13,6 +14,8 @@ app
   .use(cors())
   .use(express.json())
   .use(cookieParser());
+
+  
 
 // Routes
 require("./routes/apiRoutes")(app);
