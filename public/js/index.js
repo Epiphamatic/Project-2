@@ -61,6 +61,9 @@ var playlistClick = function() {
     console.log(response);
   });
 
+  $(".granted").hide();
+  $(".guestLink").show();
+
 };
 
 var playlistCreate = function(res) {
