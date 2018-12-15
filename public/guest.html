@@ -167,7 +167,7 @@
         console.log(id);
         // Front end can define the color after icon been clicked
         $(`i[data-id=${id}]`)
-          .css("color", "yellow")
+          .css("color", "rgb(61, 182, 255)")
           .addClass("disabled");
 
         $.get("/api/" + Action + "/" + id, function(data) {
